@@ -27,6 +27,9 @@ class GeneticAlgorithm(object):
         self.__measureFitness(self.__fitness)  # chama a funcao para medir a adaptacao de cada cromossomo
         chromosomeRank = self.__evaluateFitness()  # avalia a pontuacao obtida por cada cromossomo
 
+        self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos (Elitismo-ou-Cruzamento+Mutacao)
+        self.__chromosomePopulation = self.__newGeneration
+
     # Cria a populacao (conjunto de cromossomos)
     def __setPopulation(self):
         for n in range(self.__popSize):
@@ -55,6 +58,16 @@ class GeneticAlgorithm(object):
         print("Rank:", chromosomeRank)
         return chromosomeRank
 
+    # Gera uma nova populacao
+    def __generateNewPopulation(self, chromosomeRank):
+        self.__newGeneration = []
+        numUnvaribleOrganism = int(self.__elitism * self.__popSize)
+
+        # Processo de Elitismo para os melhores adaptados
+        for i in range(numUnvaribleOrganism):
+            self.__newGeneration.append(self.__chromosomePopulation[chromosomeRank[i][0]])
+        #print("New Generation Elitism: ")
+        self.__printNewGeneration()
 
     # Funcoes de CRUZAMENTO entre cromossomos
     def __crossover(self, chromosome1, chromosome2):
@@ -173,4 +186,8 @@ class GeneticAlgorithm(object):
     ###     Metodos Auxiliares     ###
     def __printPopulation(self):
         for chromosome in self.__chromosomePopulation:
+            print(chromosome)
+
+    def __printNewGeneration(self):
+        for chromosome in self.__newGeneration:
             print(chromosome)
