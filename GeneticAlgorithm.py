@@ -33,6 +33,7 @@ class GeneticAlgorithm(object):
             print(f'  [{bit}] {item}')
         print('=' * 40)
 
+    ###   MODALIDADES DE ALGORITMOS GENETICOS   ###
     # Algoritmo Genetico para Codificacao Binaria
     def binary_enconding(self, chromosomeSize, names, crossover='single-point'):
         self.__chromosomeSize = chromosomeSize  # numero de genes dos cromossomos
@@ -41,7 +42,7 @@ class GeneticAlgorithm(object):
 
         best_rank = self.__initializeGA()       # inicializa o processo do algoritmo genetico
 
-        #self._summary(names, best_rank)
+        self._summary(names, best_rank)
 
     # Algoritmo Genetico para Codificacao de Valor Real
     def value_encoding(self, lower, upper, names, crossover='blend'):
@@ -52,24 +53,30 @@ class GeneticAlgorithm(object):
         self.__chromosomeSize = len(self.__lower)
         self.__encoding_type = 'value'
 
-        best_rank = self.__initializeGA()       # funcao que inicializa o processo do algoritmo genetico
+        best_rank = self.__initializeGA()       # inicializa o processo do algoritmo genetico
 
         self._summary(names, best_rank)
 
-    # Funcao que inicializa o processo do algoritmo genetico
+    # Algoritmo Genetico para Codificacao de Permutacao (a fazer)
+    #def permutation_encoding(self, lower, upper, names, crossover='':
+    # end modalidades
+
+
+    # Metodo que inicializa o processo do algoritmo genetico
     def __initializeGA(self):
         self.__setPopulation()
 
         for generation in range(1, self.__numIter + 1):
-            self.__measureFitness(self.__fitness)       # chama a funcao para medir a adaptacao de cada cromossomo
+            self.__measureFitness(self.__fitness)       # chama o metodo para medir a adaptacao de cada cromossomo
             chromosomeRank = self.__evaluateFitness()   # avalia a pontuacao obtida por cada cromossomo
 
             # na ultima iteracao nao ocorre a criacao de uma nova geracao
             if generation != self.__numIter:
-                self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos
+                self.__generateNewPopulation(chromosomeRank)  # metodo de criacao de uma nova geracao de cromossomos
                 self.__chromosomePopulation = self.__newGeneration
 
                 print(f'{self.__encoding_type.capitalize()} GA | Gen = {generation} | Best Value = {chromosomeRank[0][1]}')
+        #self.__printPopulation()
         return chromosomeRank[0]
 
     # Cria a populacao (conjunto de cromossomos)
@@ -89,6 +96,8 @@ class GeneticAlgorithm(object):
             # Problemas de Valor Real tem cromossomos tipo [1.2, 3.6, 7.8, 0.8]
             for i in range(self.__chromosomeSize):
                 c.append(uniform(self.__lower[i], self.__upper[i]))
+        #else:
+            # Problemas de Permutacao tem cromossomos tipo [1, 4, 5, 2, 3]
 
         return c
 
@@ -129,7 +138,6 @@ class GeneticAlgorithm(object):
                 picked_index = self.__spinRoulette(chromosomeRank)
                 for n in selected_indices:
                     if picked_index == n:
-                        #print("repeated")
                         is_repeated = True
                         break
             selectedChromosomes.append(self.__chromosomePopulation[chromosomeRank[picked_index][0]])
@@ -137,7 +145,7 @@ class GeneticAlgorithm(object):
 
         # Decide quais serao as duplas de cromossomos para realizar o cruzamento
         i = 0
-        while len(self.__newGeneration) <= self.__popSize:
+        while len(self.__newGeneration) < self.__popSize:
             new_chromosomes = []
             if i >= len(selectedChromosomes) - 1:
                 new_chromosomes = self.__crossover(selectedChromosomes[len(selectedChromosomes) - 1], selectedChromosomes[0])
@@ -180,10 +188,11 @@ class GeneticAlgorithm(object):
                 return i    # indice da lista rankeada do cromossomo selecionado
 
 
-    # Funcoes de CRUZAMENTO entre cromossomos
+    # Metodos de CRUZAMENTO entre cromossomos
     # Binario    = ('single-point', 'two-points')
     # Valor Real = ('blend', 'aritm-mean', 'geometric-mean'
-    # os metodos ('single-point', 'blend' sao os metodos padroes
+    # Permutacao = ()
+    # os metodos ('single-point', 'blend' e '' sao os metodos padroes
     def __crossover(self, chromosome1, chromosome2):
         # Inicializa o processo de Crossover(cruzamento)
         if self.__encoding_type == 'binary':
@@ -272,7 +281,6 @@ class GeneticAlgorithm(object):
 
     @staticmethod
     def __blend_crossover(chromosomeA, chromosomeB):
-        # print("Blend Crossover Method")
         newChromosomeA = []
         newChromosomeB = []
         k = randint(0, 100)
@@ -283,15 +291,15 @@ class GeneticAlgorithm(object):
         return newChromosomeA, newChromosomeB
 
     @staticmethod
-    def __aritmeticMean_crossover():
+    def __aritmeticMean_crossover(chromosomeA, chromosomeB):
         print('Falta criar metodo de media aritmetica')
 
     @staticmethod
-    def __geometricMean_crossover():
+    def __geometricMean_crossover(chromosomeA, chromosomeB):
         print('Falta criar metodo de media geometrica')
     # end crossover
 
-    # Funcoes de MUTACAO entre cromossomos
+    # Metodos de MUTACAO entre cromossomos
     def __check_mutation(self, chromosome, probability):
         # Verifica se a mutacao occorrera, se sim, inicializa o processo de Mutacao
         # 0 < probability < 1
