@@ -24,17 +24,23 @@ class GeneticAlgorithm(object):
     def __initializeGA(self):
         self.__setPopulation()
 
-        self.__measureFitness(self.__fitness)  # chama a funcao para medir a adaptacao de cada cromossomo
-        chromosomeRank = self.__evaluateFitness()  # avalia a pontuacao obtida por cada cromossomo
+        for generation in range(1, self.__numIter + 1):
+            self.__measureFitness(self.__fitness)  # chama a funcao para medir a adaptacao de cada cromossomo
+            chromosomeRank = self.__evaluateFitness()  # avalia a pontuacao obtida por cada cromossomo
 
-        self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos (Elitismo-ou-Cruzamento+Mutacao)
-        self.__chromosomePopulation = self.__newGeneration
+            # na ultima iteracao nao ocorre a criacao de uma nova geracao
+            if generation != self.__numIter:
+                self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos (Elitismo-ou-Cruzamento+Mutacao)
+                self.__chromosomePopulation = self.__newGeneration
+
+            print(f'Generation {generation}:')
+            self.__printPopulation()
 
     # Cria a populacao (conjunto de cromossomos)
     def __setPopulation(self):
         for n in range(self.__popSize):
             self.__chromosomePopulation.append(self.__setChromosome())
-        self.__printPopulation()
+        #self.__printPopulation()
 
     # Cria cada um dos cromossomos
     def __setChromosome(self):
@@ -80,11 +86,11 @@ class GeneticAlgorithm(object):
                 picked_index = self.__spinRoulette(chromosomeRank)
                 for i in selected_indices:
                     if picked_index == i:
-                        # print("repeated")
+                        #print("repeated")
                         is_repeated = True
                         break
             selectedChromosomes.append(self.__chromosomePopulation[chromosomeRank[picked_index][0]])
-        print("Selected Chromosomes to Crossover:", selectedChromosomes)
+        #print("Selected Chromosomes to Crossover:", selectedChromosomes)
 
         # Decide quais serao as duplas de cromossomos para realizar o cruzamento
         i = 0
@@ -105,7 +111,7 @@ class GeneticAlgorithm(object):
         # portanto, exclui-se o ultimo cromossomo
         if len(self.__newGeneration) > len(self.__chromosomePopulation):
             self.__newGeneration.pop(len(self.__newGeneration) - 1)
-        self.__printNewGeneration()
+        #self.__printNewGeneration()
 
         # Processo de Mutacao para os demais cromossomos
         for i in range(numUnvaribleOrganism, self.__popSize):
@@ -146,7 +152,6 @@ class GeneticAlgorithm(object):
         # Utiliza o metodo SinglePoint, dividindo os cromossomos na metade
         # ex: [a,b,c,d, | e,f,g,h] para tamanho de cromossomos pares
         # ex: [a,b,c,d, | e,f,g] para tamanho de cromossomos impares
-        # print("Single-Point Crossover Method")
         newChromossomeA = []
         newChromosomeB = []
         tamanho = len(chromossomeA)
@@ -176,7 +181,6 @@ class GeneticAlgorithm(object):
         # ex: [a b c | d e | f g h] para tamanho de cromossomos pares
         # ex: [a b | c d e | f g]   para tamanho de cromossomos impares
         # ex: [a | b | c]           para tamanho de cromossomos == 3 (caso especial)
-        print("Two-Points Crossover Method")
         newChromosomeA = []
         newChromosomeB = []
         tamanho = len(chromosomeA)
