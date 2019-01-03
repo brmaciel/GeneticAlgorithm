@@ -138,6 +138,38 @@ class GeneticAlgorithm(object):
         return newChromosomeA, newChromosomeB
     # end crossover
 
+    # Funcoes de MUTACAO entre cromossomos
+    def __check_mutation(self, chromosome, probability):
+        # Verifica se a mutacao occorrera, se sim, inicializa o processo de Mutacao
+        # 0 < probability < 1
+        # ex: se 0.01   entao contador = 2 probability = 1, multiply 10^2 = 100
+        # ex: se 0.0006 entao contador = 4 probability = 6, multiply 10^4 = 10,000
+
+        # processo para tornar a probabilidade um numero inteiro para utilizar a funcao randint()
+        contador = 0
+        while probability % 1 != 0:
+            probability = probability * 10
+            contador += 1
+        total = pow(10, contador)
+
+        # realiza o sorteio para definir se ocorrera a mutacao
+        if randint(1, total) <= probability:
+            newChromosome = self.__mutation(chromosome)
+        else:
+            newChromosome = chromosome
+
+        return newChromosome
+
+    @staticmethod
+    def __mutation(chromosome):
+        # Altera um bit(gene) aleatorio de um cromossomo
+        # print("Mutation Occured")
+        bitMutated = randint(0, len(chromosome) - 1)
+        chromosome[bitMutated] = 0 if chromosome[bitMutated] == 1 else 1
+
+        return chromosome
+    # end mutation
+
     ###     Metodos Auxiliares     ###
     def __printPopulation(self):
         for chromosome in self.__chromosomePopulation:
