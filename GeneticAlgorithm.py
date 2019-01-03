@@ -23,6 +23,9 @@ class GeneticAlgorithm(object):
     def __initializeGA(self):
         self.__setPopulation()
 
+        self.__measureFitness(self.__fitness)  # chama a funcao para medir a adaptacao de cada cromossomo
+        chromosomeRank = self.__evaluateFitness()  # avalia a pontuacao obtida por cada cromossomo
+
     # Cria a populacao (conjunto de cromossomos)
     def __setPopulation(self):
         for n in range(self.__popSize):
@@ -36,6 +39,20 @@ class GeneticAlgorithm(object):
         for _ in range(self.__chromosomeSize):
             c.append(randint(0, 1))
         return c
+
+    # Mede o nivel de adaptacao de cada cromossomo
+    def __measureFitness(self, userFunction):
+        self.__adaptabilityLevel = {}       # dicionario keys:'indice do cromossomo'; values:'nivel de adaptacao'
+        for index, chromosome in enumerate(self.__chromosomePopulation):
+            self.__adaptabilityLevel[index] = userFunction(chromosome)
+
+    # Avalia o nivel de adaptacao de cada cromossomo
+    # rankeando os cromossomos do melhor para o pior
+    def __evaluateFitness(self):
+        chromosomeRank = sorted(self.__adaptabilityLevel.items(), key=lambda x: -x[1])
+        #print("Pontuacao:", self.__adaptabilityLevel)
+        print("Rank:", chromosomeRank)
+        return chromosomeRank
 
     ###     Metodos Auxiliares     ###
     def __printPopulation(self):
