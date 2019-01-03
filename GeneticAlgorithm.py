@@ -86,6 +86,27 @@ class GeneticAlgorithm(object):
             selectedChromosomes.append(self.__chromosomePopulation[chromosomeRank[picked_index][0]])
         print("Selected Chromosomes to Crossover:", selectedChromosomes)
 
+        # Decide quais serao as duplas de cromossomos para realizar o cruzamento
+        i = 0
+        while len(self.__newGeneration) <= self.__popSize:
+            new_chromosomes = []
+            if i >= len(selectedChromosomes) - 1:
+                new_chromosomes = self.__crossover(selectedChromosomes[len(selectedChromosomes) - 1], selectedChromosomes[0])
+                i = 1
+            else:
+                new_chromosomes = self.__crossover(selectedChromosomes[i], selectedChromosomes[i + 1])
+                i += 2
+            #print("New chromosomes: ", new_chromosomes)
+            self.__newGeneration.append(new_chromosomes[0])
+            self.__newGeneration.append(new_chromosomes[1])
+        # no casos em que se precisa de um numero impar de vagas ainda a se preencher
+        # sera gerado um cromossomo a mais no processo de cruzamento,
+        # ja que o processo de cruzamento sempre retorna um numero par de cromossomos
+        # portanto, exclui-se o ultimo cromossomo
+        if len(self.__newGeneration) > len(self.__chromosomePopulation):
+            self.__newGeneration.pop(len(self.__newGeneration) - 1)
+        self.__printNewGeneration()
+
     def __spinRoulette(self, rank):
         # deve selecionar metade, arredondando para cima, da quatidade de cromossomos restantes pra completar a proxima geracao
         # define a chance de cada cromossomo ser selecionado
