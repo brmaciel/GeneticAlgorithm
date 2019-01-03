@@ -67,7 +67,7 @@ class GeneticAlgorithm(object):
         for i in range(numUnvaribleOrganism):
             self.__newGeneration.append(self.__chromosomePopulation[chromosomeRank[i][0]])
         #print("New Generation Elitism: ")
-        self.__printNewGeneration()
+        #self.__printNewGeneration()
 
         # Processo de Crossover para completar as demais vagas na populacao
         limit = numUnvaribleOrganism + ceil((self.__popSize - numUnvaribleOrganism) / 2)
@@ -106,6 +106,10 @@ class GeneticAlgorithm(object):
         if len(self.__newGeneration) > len(self.__chromosomePopulation):
             self.__newGeneration.pop(len(self.__newGeneration) - 1)
         self.__printNewGeneration()
+
+        # Processo de Mutacao para os demais cromossomos
+        for i in range(numUnvaribleOrganism, self.__popSize):
+            self.__newGeneration[i] = self.__check_mutation(self.__newGeneration[i], self.__mutationProbability)
 
     def __spinRoulette(self, rank):
         # deve selecionar metade, arredondando para cima, da quatidade de cromossomos restantes pra completar a proxima geracao
@@ -234,7 +238,7 @@ class GeneticAlgorithm(object):
     @staticmethod
     def __mutation(chromosome):
         # Altera um bit(gene) aleatorio de um cromossomo
-        # print("Mutation Occured")
+        #print("Mutation Occured")
         bitMutated = randint(0, len(chromosome) - 1)
         chromosome[bitMutated] = 0 if chromosome[bitMutated] == 1 else 1
 
