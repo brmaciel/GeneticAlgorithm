@@ -1,8 +1,10 @@
-from random import randint
+from random import randint, uniform
 from math import ceil, floor
 
 
 class GeneticAlgorithm(object):
+    __adaptabilityLevel = {}
+    __newGeneration = []
 
     def __init__(self, populationSize, numIterations, fitnessFunction, mutationProbs=0.01, elitism=0.5):
         self.__popSize = populationSize         # numero total de cromossomos
@@ -26,7 +28,7 @@ class GeneticAlgorithm(object):
 
     def __printSolution(self, names):
         # Printa a respota final
-        print(f'\n========   BINARY GA SOLUTION  ========')
+        print(f'\n========   {self.__encoding_type.upper()} GA SOLUTION  ========')
         for bit, item in zip(self.__chromosomePopulation[0], names):
             print(f'  [{bit}] {item}')
         print('=' * 40)
@@ -39,6 +41,19 @@ class GeneticAlgorithm(object):
 
         best_rank = self.__initializeGA()       # inicializa o processo do algoritmo genetico
 
+        #self._summary(names, best_rank)
+
+    # Algoritmo Genetico para Codificacao de Valor Real
+    def value_encoding(self, lower, upper, names, crossover='blend'):
+        self.__lower = lower
+        self.__upper = upper
+        self.__crossoverMethod = crossover      # metodo de crossover ('aritm-mean', 'geometric-mean', 'blend')
+
+        self.__chromosomeSize = len(self.__lower)
+        self.__encoding_type = 'value'
+
+        best_rank = self.__initializeGA()       # funcao que inicializa o processo do algoritmo genetico
+
         self._summary(names, best_rank)
 
     # Funcao que inicializa o processo do algoritmo genetico
@@ -46,15 +61,15 @@ class GeneticAlgorithm(object):
         self.__setPopulation()
 
         for generation in range(1, self.__numIter + 1):
-            self.__measureFitness(self.__fitness)  # chama a funcao para medir a adaptacao de cada cromossomo
-            chromosomeRank = self.__evaluateFitness()  # avalia a pontuacao obtida por cada cromossomo
+            self.__measureFitness(self.__fitness)       # chama a funcao para medir a adaptacao de cada cromossomo
+            chromosomeRank = self.__evaluateFitness()   # avalia a pontuacao obtida por cada cromossomo
 
             # na ultima iteracao nao ocorre a criacao de uma nova geracao
             if generation != self.__numIter:
-                self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos (Elitismo-ou-Cruzamento+Mutacao)
+                self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos
                 self.__chromosomePopulation = self.__newGeneration
 
-                print(f'Binary GA | Gen = {generation} | Best Value = {chromosomeRank[0][1]}')
+                print(f'{self.__encoding_type.capitalize()} GA | Gen = {generation} | Best Value = {chromosomeRank[0][1]}')
         return chromosomeRank[0]
 
     # Cria a populacao (conjunto de cromossomos)
@@ -66,9 +81,15 @@ class GeneticAlgorithm(object):
     # Cria cada um dos cromossomos
     def __setChromosome(self):
         c = []
-        # Problemas Binarios tem cromossomos tipo [1, 0, 1, 0, 1, 0]
-        for _ in range(self.__chromosomeSize):
-            c.append(randint(0, 1))
+        if self.__encoding_type == 'binary':
+            # Problemas Binarios tem cromossomos tipo [1, 0, 1, 0, 1, 0]
+            for _ in range(self.__chromosomeSize):
+                c.append(randint(0, 1))
+        elif self.__encoding_type == 'value':
+            # Problemas de Valor Real tem cromossomos tipo [1.2, 3.6, 7.8, 0.8]
+            for i in range(self.__chromosomeSize):
+                c.append(uniform(self.__lower[i], self.__upper[i]))
+
         return c
 
     # Mede o nivel de adaptacao de cada cromossomo
@@ -86,6 +107,7 @@ class GeneticAlgorithm(object):
         return chromosomeRank
 
     # Gera uma nova populacao
+    # atraves dos processos de Elitismo e Cruzamento+Mutacao
     def __generateNewPopulation(self, chromosomeRank):
         self.__newGeneration = []
         numUnvaribleOrganism = int(self.__elitism * self.__popSize)
@@ -105,8 +127,8 @@ class GeneticAlgorithm(object):
             while is_repeated:
                 is_repeated = False
                 picked_index = self.__spinRoulette(chromosomeRank)
-                for i in selected_indices:
-                    if picked_index == i:
+                for n in selected_indices:
+                    if picked_index == n:
                         #print("repeated")
                         is_repeated = True
                         break
