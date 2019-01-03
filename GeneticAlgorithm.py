@@ -181,12 +181,23 @@ class GeneticAlgorithm(object):
 
 
     # Funcoes de CRUZAMENTO entre cromossomos
+    # Binario    = ('single-point', 'two-points')
+    # Valor Real = ('blend', 'aritm-mean', 'geometric-mean'
+    # os metodos ('single-point', 'blend' sao os metodos padroes
     def __crossover(self, chromosome1, chromosome2):
         # Inicializa o processo de Crossover(cruzamento)
-        if self.__crossoverMethod == 'two-points':
-            newChromosome1, newChromosome2 = self.__two_points_crossover(chromosome1, chromosome2)
-        else:
-            newChromosome1, newChromosome2 = self.__single_point_crossover(chromosome1, chromosome2)
+        if self.__encoding_type == 'binary':
+            if self.__crossoverMethod == 'two-points':
+                newChromosome1, newChromosome2 = self.__two_points_crossover(chromosome1, chromosome2)
+            else:
+                newChromosome1, newChromosome2 = self.__single_point_crossover(chromosome1, chromosome2)
+        elif self.__encoding_type == 'value':
+            if self.__crossoverMethod == 'aritm-mean':
+                newChromosome1, newChromosome2 = self.__aritmeticMean_crossover(chromosome1, chromosome2)
+            elif self.__crossoverMethod == 'geometric-mean':
+                newChromosome1, newChromosome2 = self.__geometricMean_crossover(chromosome1, chromosome2)
+            else:
+                newChromosome1, newChromosome2 = self.__blend_crossover(chromosome1, chromosome2)
 
         return newChromosome1, newChromosome2
 
@@ -258,6 +269,26 @@ class GeneticAlgorithm(object):
             newChromosomeB.append(chromosomeB[i])
 
         return newChromosomeA, newChromosomeB
+
+    @staticmethod
+    def __blend_crossover(chromosomeA, chromosomeB):
+        # print("Blend Crossover Method")
+        newChromosomeA = []
+        newChromosomeB = []
+        k = randint(0, 100)
+        for geneA, geneB in zip(chromosomeA, chromosomeB):
+            newChromosomeA.append((k / 100) * (geneA - geneB) + geneB)
+            newChromosomeB.append((k / 100) * (geneB - geneA) + geneA)
+
+        return newChromosomeA, newChromosomeB
+
+    @staticmethod
+    def __aritmeticMean_crossover():
+        print('Falta criar metodo de media aritmetica')
+
+    @staticmethod
+    def __geometricMean_crossover():
+        print('Falta criar metodo de media geometrica')
     # end crossover
 
     # Funcoes de MUTACAO entre cromossomos
