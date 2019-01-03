@@ -69,6 +69,43 @@ class GeneticAlgorithm(object):
         #print("New Generation Elitism: ")
         self.__printNewGeneration()
 
+        # Processo de Crossover para completar as demais vagas na populacao
+        limit = numUnvaribleOrganism + ceil((self.__popSize - numUnvaribleOrganism) / 2)
+        selectedChromosomes = []  # cromossomos selecionados para o processo de crossover
+        selected_indices = []
+        for i in range(numUnvaribleOrganism, limit):
+            is_repeated = True
+            while is_repeated:
+                is_repeated = False
+                picked_index = self.__spinRoulette(chromosomeRank)
+                for i in selected_indices:
+                    if picked_index == i:
+                        # print("repeated")
+                        is_repeated = True
+                        break
+            selectedChromosomes.append(self.__chromosomePopulation[chromosomeRank[picked_index][0]])
+        print("Selected Chromosomes to Crossover:", selectedChromosomes)
+
+    def __spinRoulette(self, rank):
+        # deve selecionar metade, arredondando para cima, da quatidade de cromossomos restantes pra completar a proxima geracao
+        # define a chance de cada cromossomo ser selecionado
+        # cromossomos com melhor nivel de adaptacao tem maiores chances
+        # Foi adotada a seguinte estrategia:
+        # ex: para 10 cromossomos as chances serao de [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] num total de 55 possibilidades
+        # os cromossomos se encontram rankeados em ordem de melhor nivel de adaptacao
+        chances = []            # cria uma lista com as possibilidades de cada cromossomo
+        for i in range(len(rank), 0, -1):
+            chances.append(i)
+        total = sum(chances)
+        #print(chances, total)
+        random_num = randint(1, total)
+        #print("Random number picked: ", random_num)
+        for i in range(len(chances)):
+            if random_num <= sum(chances[0:i + 1]):
+                #print("Selected Index {} from rank list".format(i))
+                return i    # indice da lista rankeada do cromossomo selecionado
+
+
     # Funcoes de CRUZAMENTO entre cromossomos
     def __crossover(self, chromosome1, chromosome2):
         # Inicializa o processo de Crossover(cruzamento)
