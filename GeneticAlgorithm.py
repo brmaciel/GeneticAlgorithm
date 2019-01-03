@@ -307,18 +307,21 @@ class GeneticAlgorithm(object):
 
         # realiza o sorteio para definir se ocorrera a mutacao
         if randint(1, total) <= probability:
-            newChromosome = self.__mutation(chromosome)
+            newChromosome = self.__mutation(chromosome, self.__encoding_type)
         else:
             newChromosome = chromosome
 
         return newChromosome
 
     @staticmethod
-    def __mutation(chromosome):
+    def __mutation(chromosome, encoding_type):
         # Altera um bit(gene) aleatorio de um cromossomo
         #print("Mutation Occured")
         bitMutated = randint(0, len(chromosome) - 1)
-        chromosome[bitMutated] = 0 if chromosome[bitMutated] == 1 else 1
+        if encoding_type == 'binary':
+            chromosome[bitMutated] = 0 if chromosome[bitMutated] == 1 else 1
+        elif encoding_type == 'value':
+            chromosome[bitMutated] = chromosome[bitMutated] * (-1)
 
         return chromosome
     # end mutation
