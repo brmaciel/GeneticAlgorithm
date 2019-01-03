@@ -12,13 +12,34 @@ class GeneticAlgorithm(object):
         self.__elitism = elitism                # porcentagem dos individuos que sao mais adaptados e devem sobreviver
         self.__chromosomePopulation = []
 
+
+    def _summary(self, names, best_rank):
+        print(f'\n========   {self.__encoding_type.upper()} GA SETTINGS  ========')
+        print(f'Population size:\t\t = {self.__popSize}')
+        print(f'Number of Generations:\t = {self.__numIter}')
+        print(f'Elitism: \t\t\t\t = {self.__elitism * 100}%')
+        print(f"Crossover method:\t\t = '{self.__crossoverMethod}'")
+        print(f'Mutation probability:\t = {self.__mutationProbability}')
+        print(f'Fitness function value\t = {best_rank[1]}')
+
+        self.__printSolution(names)
+
+    def __printSolution(self, names):
+        # Printa a respota final
+        print(f'\n========   BINARY GA SOLUTION  ========')
+        for bit, item in zip(self.__chromosomePopulation[0], names):
+            print(f'  [{bit}] {item}')
+        print('=' * 40)
+
     # Algoritmo Genetico para Codificacao Binaria
     def binary_enconding(self, chromosomeSize, names, crossover='single-point'):
         self.__chromosomeSize = chromosomeSize  # numero de genes dos cromossomos
         self.__crossoverMethod = crossover      # metodo de crossover ('single-point' ou 'two-points')
         self.__encoding_type = 'binary'
 
-        self.__initializeGA()       # inicializa o processo do algoritmo genetico
+        best_rank = self.__initializeGA()       # inicializa o processo do algoritmo genetico
+
+        self._summary(names, best_rank)
 
     # Funcao que inicializa o processo do algoritmo genetico
     def __initializeGA(self):
@@ -33,8 +54,8 @@ class GeneticAlgorithm(object):
                 self.__generateNewPopulation(chromosomeRank)  # gera uma nova geracao de cromossomos (Elitismo-ou-Cruzamento+Mutacao)
                 self.__chromosomePopulation = self.__newGeneration
 
-            print(f'Generation {generation}:')
-            self.__printPopulation()
+                print(f'Binary GA | Gen = {generation} | Best Value = {chromosomeRank[0][1]}')
+        return chromosomeRank[0]
 
     # Cria a populacao (conjunto de cromossomos)
     def __setPopulation(self):
@@ -61,7 +82,7 @@ class GeneticAlgorithm(object):
     def __evaluateFitness(self):
         chromosomeRank = sorted(self.__adaptabilityLevel.items(), key=lambda x: -x[1])
         #print("Pontuacao:", self.__adaptabilityLevel)
-        print("Rank:", chromosomeRank)
+        #print("Rank:", chromosomeRank)
         return chromosomeRank
 
     # Gera uma nova populacao
