@@ -440,6 +440,15 @@ class GeneticAlgorithm(object):
             chromosome[bitMutated] = 0 if chromosome[bitMutated] == 1 else 1
         elif encoding_type == 'value':
             chromosome[bitMutated] = chromosome[bitMutated] * (-1)
+        elif encoding_type == 'permutation':
+            # seleciona 2 genes e os troca de lugar entre si
+            bit2 = randint(0, len(chromosome) - 1)
+            # garante que os 2 indices nao serao iguai
+            while bit2 == bitMutated:
+                bit2 = randint(0, len(chromosome) - 1)
+            aux = chromosome[bitMutated]
+            chromosome[bitMutated] = chromosome[bit2]
+            chromosome[bit2] = aux
 
         return chromosome
     # end mutation
