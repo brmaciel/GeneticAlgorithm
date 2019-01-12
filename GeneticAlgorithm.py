@@ -1,6 +1,22 @@
 from random import randint, uniform, shuffle
 from math import ceil, floor
 
+# < DOCUMENTACAO de AJUDA >
+# INTERFACES:
+# - Criacao de Objeto:
+#   GeneticAlgorithm(populationSize, numIterations, fitnessFunction, mutationProbs[opcional], elitism[opcional])
+
+# - Problemas Binarios:
+#   binary_enconding(chromosomeSize, names, crossover[opcional])
+# - Problemas de Valor Real:
+#   value_encoding(lower, upper, names, crossover[opcional])
+# - Problemas de Permutacao:
+#   permutation_encoding(lower, upper, names, crossover[opcional])
+
+# VALORES DE RETORNO:
+# os 3 metodos de resolucao de problemas (binary, value, permutation)
+# retornam sempre o cromossomo melhor adaptado e seu respectivo nivel de adaptacao medido
+
 
 class GeneticAlgorithm(object):
     __adaptabilityLevel = {}
@@ -22,7 +38,7 @@ class GeneticAlgorithm(object):
         print(f'Elitism: \t\t\t\t = {self.__elitism * 100}%')
         print(f"Crossover method:\t\t = '{self.__crossoverMethod}'")
         print(f'Mutation probability:\t = {self.__mutationProbability}')
-        print(f'Fitness function value\t = {best_rank[1]}')
+        print(f'Fitness function value\t = {best_rank}')
 
         self.__printSolution(names)
 
@@ -44,6 +60,8 @@ class GeneticAlgorithm(object):
 
         self._summary(names, best_rank)
 
+        return [self.__chromosomePopulation[0], best_rank]
+
     # Algoritmo Genetico para Codificacao de Valor Real
     def value_encoding(self, lower, upper, names, crossover='blend'):
         self.__lower = lower
@@ -57,6 +75,8 @@ class GeneticAlgorithm(object):
 
         self._summary(names, best_rank)
 
+        return [self.__chromosomePopulation[0], best_rank]
+
     # Algoritmo Genetico para Codificacao de Permutacao (a fazer)
     def permutation_encoding(self, lower, upper, names, crossover='position-based'):
         self.__lower = lower
@@ -69,6 +89,8 @@ class GeneticAlgorithm(object):
         best_rank = self.__initializeGA()   # inicializa o processo do algoritmo genetico
 
         self._summary(names, best_rank)
+
+        return [self.__chromosomePopulation[0], best_rank]
     # end modalidades
 
 
@@ -87,7 +109,7 @@ class GeneticAlgorithm(object):
 
                 print(f'{self.__encoding_type.capitalize()} GA | Gen = {generation} | Best Value = {chromosomeRank[0][1]}')
         #self.__printPopulation()
-        return chromosomeRank[0]
+        return chromosomeRank[0][1]
 
     # Cria a populacao (conjunto de cromossomos)
     def __setPopulation(self):
