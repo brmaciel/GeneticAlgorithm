@@ -58,7 +58,17 @@ class GeneticAlgorithm(object):
         self._summary(names, best_rank)
 
     # Algoritmo Genetico para Codificacao de Permutacao (a fazer)
-    #def permutation_encoding(self, lower, upper, names, crossover='':
+    def permutation_encoding(self, lower, upper, names, crossover=''):
+        self.__lower = lower
+        self.__upper = upper
+        self.__crossoverMethod = crossover  # metodo de crossover ('position', 'order', '')
+
+        self.__chromosomeSize = len(self.__lower)
+        self.__encoding_type = 'encoding'
+
+        best_rank = self.__initializeGA()   # inicializa o processo do algoritmo genetico
+
+        self._summary(names, best_rank)
     # end modalidades
 
 
@@ -191,8 +201,8 @@ class GeneticAlgorithm(object):
     # Metodos de CRUZAMENTO entre cromossomos
     # Binario    = ('single-point', 'two-points')
     # Valor Real = ('blend', 'aritm-mean', 'geometric-mean'
-    # Permutacao = ()
-    # os metodos ('single-point', 'blend' e '' sao os metodos padroes
+    # Permutacao = ('position-based', 'order-based')
+    # os metodos ('single-point', 'blend' e 'position-based' sao os metodos padroes
     def __crossover(self, chromosome1, chromosome2):
         # Inicializa o processo de Crossover(cruzamento)
         if self.__encoding_type == 'binary':
@@ -207,36 +217,42 @@ class GeneticAlgorithm(object):
                 newChromosome1, newChromosome2 = self.__geometricMean_crossover(chromosome1, chromosome2)
             else:
                 newChromosome1, newChromosome2 = self.__blend_crossover(chromosome1, chromosome2)
+        elif self.__encoding_type == 'permutation':
+            if self.__crossoverMethod == 'order-based':
+                newChromosome1, newChromosome2 = self.__order_crossover(chromosome1, chromosome2)
+            else:
+                newChromosome1, newChromosome2 = self.__position_crossover(chromosome1, chromosome2)
+            pass
 
         return newChromosome1, newChromosome2
 
     @staticmethod
-    def __single_point_crossover(chromossomeA, chromossomeB):
+    def __single_point_crossover(chromosomeA, chromosomeB):
         # Utiliza o metodo SinglePoint, dividindo os cromossomos na metade
         # ex: [a,b,c,d, | e,f,g,h] para tamanho de cromossomos pares
         # ex: [a,b,c,d, | e,f,g] para tamanho de cromossomos impares
-        newChromossomeA = []
+        newChromosomeA = []
         newChromosomeB = []
-        tamanho = len(chromossomeA)
+        tamanho = len(chromosomeA)
         middle = ceil(tamanho / 2)
 
         # primeira metade do cromossomo permanece igual
         for i in range(middle):
-            newChromossomeA.append(chromossomeA[i])
-            newChromosomeB.append(chromossomeB[i])
+            newChromosomeA.append(chromosomeA[i])
+            newChromosomeB.append(chromosomeB[i])
 
         # segunda metade do cromossomo eh alterada
         # se tamanho do cromosso for impar, segunda metade tem tem um bit a menos que a primeira metade
-        if len(chromossomeA) % 2 == 0:
+        if len(chromosomeA) % 2 == 0:
             for i in range(middle, tamanho):
-                newChromossomeA.append(chromossomeB[i])
-                newChromosomeB.append(chromossomeA[i])
+                newChromosomeA.append(chromosomeB[i])
+                newChromosomeB.append(chromosomeA[i])
         else:
             for i in range(middle, tamanho):
-                newChromossomeA.append(chromossomeB[i])
-                newChromosomeB.append(chromossomeA[i])
+                newChromosomeA.append(chromosomeB[i])
+                newChromosomeB.append(chromosomeA[i])
 
-        return newChromossomeA, newChromosomeB
+        return newChromosomeA, newChromosomeB
 
     @staticmethod
     def __two_points_crossover(chromosomeA, chromosomeB):
@@ -292,11 +308,104 @@ class GeneticAlgorithm(object):
 
     @staticmethod
     def __aritmeticMean_crossover(chromosomeA, chromosomeB):
-        print('Falta criar metodo de media aritmetica')
+        # Falta criar metodo de media aritmetica
+        pass
 
     @staticmethod
     def __geometricMean_crossover(chromosomeA, chromosomeB):
-        print('Falta criar metodo de media geometrica')
+        # Falta criar metodo de media geometrica
+        pass
+
+    @staticmethod
+    def __position_crossover(chromosomeA, chromosomeB):
+        # Utiliza o metodo baseado na Posicao, onde os genes dos indices selecionados permanecem na posicao fixa
+        # ex: [0 1 2 3 5 4]  --> seleciona indices (0, 2, 5) --> [2 0 5 3 4 1]
+        # ex: [2 4 5 0 3 1]  -->                             --> [0 5 2 3 1 4]
+        newChromosomeA = []
+        newChromosomeB = []
+        tamanho = len(chromosomeA)
+        middle = floor(tamanho / 2)
+
+        # inicializa novos cromossomos com valores None
+        for i in range(tamanho):
+            newChromosomeA.append(None)
+            newChromosomeB.append(None)
+
+        # seleciona indices para serem cruzados (quantidade = metade do tamanho do cromossomo)
+        indices = []
+        while len(indices) < middle:
+            num = randint(0, tamanho - 1)
+            # garante que nao ha indices repetidos
+            if not num in indices:
+                indices.append(num)
+        #print(f'Indices selecionados: {indices}')
+
+        # Insere genes selecionados de cada pai em cada filho
+        for index in indices:
+            newChromosomeA[index] = chromosomeB[index]
+            newChromosomeB[index] = chromosomeA[index]
+
+        # Completa os genes restantes com os genes do outro pai
+        for geneA, geneB in zip(chromosomeA, chromosomeB):
+            if not geneA in newChromosomeA:
+                for index in range(len(newChromosomeA)):
+                    if newChromosomeA[index] is None:
+                        newChromosomeA[index] = geneA
+                        break
+            if not geneB in newChromosomeB:
+                for index in range(len(newChromosomeB)):
+                    if newChromosomeB[index] is None:
+                        newChromosomeB[index] = geneB
+                        break
+
+        return newChromosomeA, newChromosomeB
+
+    @staticmethod
+    def __order_crossover(chromosomeA, chromosomeB):
+        # Utiliza o metodo baseado na Ordem
+        # onde os genes dos indices selecionados sao excluidos e completados pelos genes restantes do outro pai
+        # de acordo com a ordem em que aparecem
+        # ex: [0 1 2 3 5 4 6]  --> seleciona indices (0, 3, 5) --> [4 1 2 0 5 3 6]
+        # ex: [2 4 6 0 3 5 1]  -->                             --> [0 4 6 2 3 5 1]
+        newChromosomeA = []
+        newChromosomeB = []
+        tamanho = len(chromosomeA)
+        middle = floor(tamanho / 2)
+
+        # inicializa novos cromossomos com valores None
+        for i in range(tamanho):
+            newChromosomeA.append(None)
+            newChromosomeB.append(None)
+
+        # seleciona indices para terem os genes excluidos e depois alterados (quantidade = metade do tamanho do cromossomo)
+        indices = []
+        while len(indices) < middle:
+            num = randint(0, tamanho - 1)
+            # garante que nao ha indices repetidos
+            if not num in indices:
+                indices.append(num)
+        #print(f'Indices selecionados: {indices}')
+
+        # Insere genes de cada pai em cada filho exceto nos indices selecionados
+        for index in range(tamanho):
+            if not index in indices:
+                newChromosomeA[index] = chromosomeA[index]
+                newChromosomeB[index] = chromosomeB[index]
+
+        # Completa os genes dos indices selecionados com os genes do outro pai de acordo com a sua ordem de aparencia
+        for geneA, geneB in zip(chromosomeA, chromosomeB):
+            if not geneA in newChromosomeB:
+                for index in range(tamanho):
+                    if newChromosomeB[index] is None:
+                        newChromosomeB[index] = geneA
+                        break
+            if not geneB in newChromosomeA:
+                for index in range(tamanho):
+                    if newChromosomeA[index] is None:
+                        newChromosomeA[index] = geneB
+                        break
+
+        return newChromosomeA, newChromosomeB
     # end crossover
 
     # Metodos de MUTACAO entre cromossomos
