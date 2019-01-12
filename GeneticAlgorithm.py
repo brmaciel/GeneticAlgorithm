@@ -1,4 +1,4 @@
-from random import randint, uniform
+from random import randint, uniform, shuffle
 from math import ceil, floor
 
 
@@ -58,13 +58,13 @@ class GeneticAlgorithm(object):
         self._summary(names, best_rank)
 
     # Algoritmo Genetico para Codificacao de Permutacao (a fazer)
-    def permutation_encoding(self, lower, upper, names, crossover=''):
+    def permutation_encoding(self, lower, upper, names, crossover='position-based'):
         self.__lower = lower
         self.__upper = upper
-        self.__crossoverMethod = crossover  # metodo de crossover ('position', 'order', '')
+        self.__crossoverMethod = crossover  # metodo de crossover ('position-based', 'order-based')
 
         self.__chromosomeSize = len(self.__lower)
-        self.__encoding_type = 'encoding'
+        self.__encoding_type = 'permutation'
 
         best_rank = self.__initializeGA()   # inicializa o processo do algoritmo genetico
 
@@ -106,8 +106,10 @@ class GeneticAlgorithm(object):
             # Problemas de Valor Real tem cromossomos tipo [1.2, 3.6, 7.8, 0.8]
             for i in range(self.__chromosomeSize):
                 c.append(uniform(self.__lower[i], self.__upper[i]))
-        #else:
+        else:
             # Problemas de Permutacao tem cromossomos tipo [1, 4, 5, 2, 3]
+            c = [num for num in range(self.__lower[0], self.__upper[0]+1)]
+            shuffle(c)
 
         return c
 
@@ -222,7 +224,6 @@ class GeneticAlgorithm(object):
                 newChromosome1, newChromosome2 = self.__order_crossover(chromosome1, chromosome2)
             else:
                 newChromosome1, newChromosome2 = self.__position_crossover(chromosome1, chromosome2)
-            pass
 
         return newChromosome1, newChromosome2
 
