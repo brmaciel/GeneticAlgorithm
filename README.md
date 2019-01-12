@@ -6,7 +6,7 @@ Ajuda para compreender a interface do algoritmo:
   <p>GeneticAlgorithm(populationSize, numIterations, fitnessFunction, mutationProbs[opcional], elitism[opcional])</p>
 
 2. Metodos Públicos:
-2.1 Problemas Binarios:
+<p>2.1 Problemas Binarios:</p>
   <p>binary_enconding(chromosomeSize, names, crossover[opcional])</p>
 2.2 Problemas de Valor Real:
   <p>value_encoding(lower, upper, names, crossover[opcional])</p>
