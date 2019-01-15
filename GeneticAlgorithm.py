@@ -43,6 +43,17 @@ class GeneticAlgorithm(object):
         self.__printSolution(names)
 
     def __printSolution(self, names):
+        # se usuario deixar parametro 'names' em branco, cria nome padrao para cada gene
+        if names == ['']:
+            names = []
+            for n in range(len(self.__chromosomePopulation[0])):
+                names.append(f'item {n + 1}')
+        if len(names) != len(self.__chromosomePopulation[0]):
+            print("\nERROR! Size of parameter 'names' differs from number of chromosomes!")
+            print('List was auto completed')
+            for n in range(len(names), len(self.__chromosomePopulation[0])):
+                names.append(f'item {n + 1}')
+
         # Printa a respota final
         print(f'\n========   {self.__encoding_type.upper()} GA SOLUTION  ========')
         for bit, item in zip(self.__chromosomePopulation[0], names):
@@ -51,7 +62,7 @@ class GeneticAlgorithm(object):
 
     ###   MODALIDADES DE ALGORITMOS GENETICOS   ###
     # Algoritmo Genetico para Codificacao Binaria
-    def binary_enconding(self, chromosomeSize, names, crossover='single-point'):
+    def binary_enconding(self, chromosomeSize, names=[''], crossover='single-point'):
         self.__chromosomeSize = chromosomeSize  # numero de genes dos cromossomos
         self.__crossoverMethod = crossover      # metodo de crossover ('single-point' ou 'two-points')
         self.__encoding_type = 'binary'
@@ -63,7 +74,7 @@ class GeneticAlgorithm(object):
         return [self.__chromosomePopulation[0], best_rank]
 
     # Algoritmo Genetico para Codificacao de Valor Real
-    def value_encoding(self, lower, upper, names, crossover='blend'):
+    def value_encoding(self, lower, upper, names=[''], crossover='blend'):
         self.__lower = lower
         self.__upper = upper
         self.__crossoverMethod = crossover      # metodo de crossover ('aritm-mean', 'geometric-mean', 'blend')
@@ -78,7 +89,7 @@ class GeneticAlgorithm(object):
         return [self.__chromosomePopulation[0], best_rank]
 
     # Algoritmo Genetico para Codificacao de Permutacao (a fazer)
-    def permutation_encoding(self, lower, upper, names, crossover='position-based'):
+    def permutation_encoding(self, lower, upper, names=[''], crossover='position-based'):
         self.__lower = lower
         self.__upper = upper
         self.__crossoverMethod = crossover  # metodo de crossover ('position-based', 'order-based')
